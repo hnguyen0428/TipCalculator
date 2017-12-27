@@ -34,7 +34,6 @@ class ViewController: UIViewController {
         if let index = index {
             // Only change the segmented control if the value was changed in
             // the settings page
-            print(valueChanged)
             if valueChanged {
                 segmentedControl.selectedSegmentIndex = index
             }
@@ -60,24 +59,48 @@ class ViewController: UIViewController {
         }
     }
     
+    // Called when the app is terminated
     func saveState() {
         UserDefaults.standard.set(tipLabel.text!, forKey: "tip_amount")
         UserDefaults.standard.set(totalLabel.text!, forKey: "total_amount")
         if let bill = priceField.text {
             UserDefaults.standard.set(bill, forKey: "bill_amount")
         }
+        UserDefaults.standard.set(segmentedControl.selectedSegmentIndex, forKey: "selected_index")
         
         UserDefaults.standard.set(NSDate(), forKey: "closed_time")
     }
     
-    func resetState() {
+    func restoreState() {
+        let date = UserDefaults.standard.object(forKey: "closed_time") as? NSDate
+
+        if let date = date {
+            let interval = date.timeIntervalSinceNow
+            if interval < -600 {
+                resetState()
+                return
+            }
+        }
+        
         let bill = UserDefaults.standard.object(forKey: "bill_amount") as? String
         let total = UserDefaults.standard.object(forKey: "total_amount") as? String
         let tip = UserDefaults.standard.object(forKey: "tip_amount") as? String
+        let index = UserDefaults.standard.object(forKey: "selected_index") as? Int
         
         priceField.text = bill
         totalLabel.text = total
         tipLabel.text = tip
+        segmentedControl.selectedSegmentIndex = index ?? 0
+    }
+    
+    func resetState() {
+        priceField.text = ""
+        totalLabel.text = "$0.00"
+        tipLabel.text = "$0.00"
+        
+        UserDefaults.standard.set(nil, forKey: "bill_amount")
+        UserDefaults.standard.set(nil, forKey: "total_amount")
+        UserDefaults.standard.set(nil, forKey: "tip_amount")
     }
 }
 
