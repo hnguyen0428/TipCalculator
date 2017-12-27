@@ -54,8 +54,12 @@ class ViewController: UIViewController {
             let tip = price * tipPercent
             let total = price + tip
             
-            tipLabel.text = String.init(format: "$%.2f", tip)
-            totalLabel.text = String.init(format: "$%.2f", total)
+            let fmt = NumberFormatter()
+            fmt.numberStyle = .currency
+            fmt.locale = Locale.current
+            
+            tipLabel.text = fmt.string(from: NSNumber(value: tip))
+            totalLabel.text = fmt.string(from: NSNumber(value: total))
         }
     }
     
@@ -94,9 +98,13 @@ class ViewController: UIViewController {
     }
     
     func resetState() {
+        let fmt = NumberFormatter()
+        fmt.numberStyle = .currency
+        fmt.locale = Locale.current
+        
         priceField.text = ""
-        totalLabel.text = "$0.00"
-        tipLabel.text = "$0.00"
+        totalLabel.text = fmt.string(from: 0)
+        tipLabel.text = fmt.string(from: 0)
         
         UserDefaults.standard.set(nil, forKey: "bill_amount")
         UserDefaults.standard.set(nil, forKey: "total_amount")
